@@ -10,11 +10,19 @@ import eval_utils as utils
 
 palmtree = utils.UsableTransformer(model_path="./palmtree/transformer.ep19", vocab_path="./palmtree/vocab")
 files=[]
-for f in os.listdir():
-    if(f[-5:]==".text"):
-        files.append(f)
-    else:
-        continue
+benign=True
+if(benign==True):
+    for f in os.listdir("out/Benigns/"):
+        if(f[-5:]==".text"):
+            files.append(f)
+        else:
+            continue
+else:
+    for f in os.listdir("out/Malicious/"):
+        if(f[-5:]==".text"):
+            files.append(f)
+        else:
+            continue
 
 def createEmbeddings(inp):
     text=[]
@@ -42,10 +50,6 @@ def createEmbeddings(inp):
         embeddings = palmtree.encode(ar)
         for embedding in embeddings:
             test+=embedding[0]
-            #write the file
-            # with open("out/"+inp+".output","a") as out:
-            #     out.write(str(embedding))
-            #     out.write("\n")
             #add the vector to the numpy array
             program2vec=np.add(program2vec,embedding)
         print(embeddings.shape)
@@ -58,4 +62,5 @@ def createEmbeddings(inp):
     print(test)
 
 for file in files:
+    print(file)
     createEmbeddings(str(file))
