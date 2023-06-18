@@ -109,8 +109,6 @@ if __name__ =="__main__":
     print(chunked_list)
     print(len(chunked_list))
 
-    manager = multiprocessing.Manager()
-
     processes = []
     for s in range(numberofthreads):
         process = multiprocessing.Process(target=threadingtask, args=(chunked_list[s],))
