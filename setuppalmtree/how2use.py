@@ -10,7 +10,7 @@ import eval_utils as utils
 
 palmtree = utils.UsableTransformer(model_path="./palmtree/transformer.ep19", vocab_path="./palmtree/vocab")
 files=[]
-benign=True
+benign=False
 if(benign==True):
     for f in os.listdir("out/Benigns/"):
         if(f[-5:]==".text"):
@@ -24,7 +24,7 @@ else:
         else:
             continue
 
-def createEmbeddings(inp):
+def createEmbeddings(inp,filename):
     text=[]
     #read one program as input and add it to the assembly text array
     with open(inp,"r") as input:
@@ -54,13 +54,19 @@ def createEmbeddings(inp):
             program2vec=np.add(program2vec,embedding)
         print(embeddings.shape)
         ar.clear()
-    print(program2vec)
-    test=test/len(text)
     program2vec=np.divide(program2vec,len(text))
     print(program2vec)
     print(program2vec.shape)
-    print(test)
+    if(benign==True):
+        with open("out/Benigns/out/"+filename+".embed","w") as out:
+            out.write(str(program2vec))
+    else:
+        with open("out/Malicious/out/"+filename+".embed","w") as out:
+            out.write(str(program2vec))
 
 for file in files:
     print(file)
-    createEmbeddings(str(file))
+    if(benign==True):
+        createEmbeddings("out/Benigns/"+str(file),str(file))
+    else:
+        createEmbeddings("out/Malicious/"+str(file),str(file))
