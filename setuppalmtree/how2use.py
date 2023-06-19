@@ -58,11 +58,9 @@ def createEmbeddings(inp,filename):
     print(program2vec)
     print(program2vec.shape)
     if(benign==True):
-        with open("out/Benigns/out/"+filename+".embed","w") as out:
-            out.write(str(program2vec))
+        np.save("out/Benigns/out/"+filename+".npy",program2vec)
     else:
-        with open("out/Malicious/out/"+filename+".embed","w") as out:
-            out.write(str(program2vec))
+        np.save("out/Malicious/out/"+filename+".npy",program2vec)
 
 for file in files:
     print(file)
