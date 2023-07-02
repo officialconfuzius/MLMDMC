@@ -3,9 +3,9 @@ from config import *
 from torch import nn
 from scipy.ndimage.filters import gaussian_filter1d
 from torch.autograd import Variable
-import torch
 import numpy as np
 import eval_utils as utils
+import csv
 
 
 palmtree = utils.UsableTransformer(model_path="./palmtree/transformer.ep19", vocab_path="./palmtree/vocab")
@@ -58,9 +58,14 @@ def createEmbeddings(inp,filename):
     print(program2vec)
     print(program2vec.shape)
     if(benign==True):
-        np.save("out/Benigns/out/"+filename+".npy",program2vec)
+        with open("out/Benigns/out/benignembeddings.csv", "a") as output: 
+            writer=csv.writer(output)
+            writer.writerow(program2vec)
     else:
-        np.save("out/Malicious/out/"+filename+".npy",program2vec)
+        with open("out/Malicious/out/maliciousembeddings.csv", "a") as output:
+            writer=csv.writer(output)
+            output.write("malwaretype,")
+            writer.writerow(program2vec)
 
 for file in files:
     print(file)

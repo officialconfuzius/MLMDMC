@@ -5,7 +5,7 @@ import pefile
 import multiprocessing
 from math import ceil
 files = []
-benign=True
+benign=False
 numberofthreads=4
 
 def get_main_code_section(sections, base_of_code):
