@@ -1,13 +1,16 @@
 from sklearn.cluster import KMeans
 import pandas as pd
+from sklearn.preprocessing import StandardScaler
 import matplotlib.pyplot as plt
 
 
 df = pd.read_csv("out/Malicious/out/maliciousembeddings.csv",header=None)
-print(df)
+X=df.iloc[:,2:].values
+sc=StandardScaler()
+X = sc.fit_transform(X)
 #setup kmeans
-kmeans = KMeans(n_clusters=3)
-kmeans.fit(df.iloc[:,1:])
+kmeans = KMeans(n_clusters=5)
+kmeans.fit(X)
 df["cluster"]=kmeans.labels_
 print(df)
 
