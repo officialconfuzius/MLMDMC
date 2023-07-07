@@ -111,7 +111,18 @@ def generatescores(instructions,dict):
             sumofallscores = sumofallscores + tfidfscore
         re.append(tfidfscore)
     return re
-    
+
+def minimizearray(array,tfidfar):
+    i = 0
+    while (i < len(array)): 
+        if(tfidfar[i]==0.0): 
+            array.pop(i)
+            tfidfar.pop(i)
+            continue
+        else:
+            i+=1
+    return array
+
 def createEmbeddings(inp,filename):
     text=[]
     malwaretype=findMalwareType(filename)
@@ -124,7 +135,7 @@ def createEmbeddings(inp,filename):
     #generate dictionary for all tf scores: 
     frequencies = generatefrequencies(text)
     #adjust the length of the input read
-    length=1000
+    length=10000
     ar=[]
     program2vec=np.zeros(128)
     while(i<len(text)):
@@ -138,18 +149,21 @@ def createEmbeddings(inp,filename):
                 i+=1
         #generate all tf-idf scores for ar array
         tfidf=generatescores(ar,frequencies)
+        #reduce computation effort
+        ar = minimizearray(ar,tfidf)
         #generate the embeddings based on assembly array
-        embeddings = palmtree.encode(ar)
-        # uncomment for old implementation
-        # for embedding in embeddings:
-        iterator=0
-        while iterator < len(embeddings):
-            #tf-idf implmementation
-            embeddings[iterator]=np.multiply(embeddings[iterator],tfidf[iterator])
-            #add the vector to the numpy array
-            program2vec=np.add(program2vec,embeddings[iterator])
-            iterator+=1
-        ar.clear()
+        if(len(ar)>0):
+            embeddings = palmtree.encode(ar)
+            # uncomment for old implementation
+            # for embedding in embeddings:
+            iterator=0
+            while iterator < len(embeddings):
+                #tf-idf implmementation
+                embeddings[iterator]=np.multiply(embeddings[iterator],tfidf[iterator])
+                #add the vector to the numpy array
+                program2vec=np.add(program2vec,embeddings[iterator])
+                iterator+=1
+            ar.clear()
     program2vec=np.divide(program2vec,sumofallscores)
     print(program2vec)
     if(benign==True):
