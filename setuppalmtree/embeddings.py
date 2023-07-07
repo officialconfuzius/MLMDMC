@@ -6,11 +6,15 @@ from torch.autograd import Variable
 import numpy as np
 import eval_utils as utils
 import csv
+import pandas as pd
+import math
 
 
 palmtree = utils.UsableTransformer(model_path="./palmtree/transformer.ep19", vocab_path="./palmtree/vocab")
 files=[]
 benign=False
+
+df = pd.read_csv("out/idfscores.csv")
 
 def findMalwareType(filename):
     if(benign):
@@ -42,7 +46,8 @@ def findMalwareType(filename):
     elif(filename.find("Packed")!=-1 or filename.find("packed")!=-1):
         return 13
     else:
-        return 0
+        #return 14 if malware cannot be matched
+        return 14
 if(benign==True):
     for f in os.listdir("out/Benigns/"):
         if(f[-5:]==".text"):
@@ -56,51 +61,106 @@ else:
         else:
             continue
 
+def recognizeinst(assemblyline): 
+    index = 0
+    while(index < len(assemblyline)):
+        instr="" 
+        if(assemblyline[index] == " "): 
+            i2 = 0
+            while(i2 < index):
+                instr=instr+assemblyline[i2]
+                i2+=1
+            return instr
+        index+=1
+    return None
+
+def getNumberOfDocuments():
+    number=0
+    ar1=readfiles("out/Malcious/")
+    ar2=readfiles("out/Benign/")
+    number=len(ar1)+len(ar2)
+    return number
+
+def readfiles(path):
+    files=[]
+    for file in os.listdir(path): 
+        if(file[-5:]==".text"):
+            files.append(file)
+    return files
+
+def generatefrequencies(instructions): 
+    dict = {}
+    for inst in instructions: 
+        instruction = recognizeinst(inst)
+        if (instruction in dict.keys()):
+            dict[instruction]=dict[instruction]+1
+        else: 
+            dict[instruction]=1
+    return dict
+
+def generatescores(instructions,dict):
+    re = []
+    numberofdocs=getNumberOfDocuments()
+    for inst in instructions: 
+        docfreq=df["document_frequency"][df["name"].index(inst)]
+        tf=dict[inst]
+        tfidfscore=math.log10(numberofdocs/docfreq)*tf
+        re.append(tfidfscore)
+    return re
+    
 def createEmbeddings(inp,filename):
     text=[]
     malwaretype=findMalwareType(filename)
-    if((benign==False and malwaretype!=0) or benign):
-        #read one program as input and add it to the assembly text array
-        with open(inp,"r") as input:
-            for texti in input.readlines():
-                texti=texti[:-1]
-                text.append(texti)
-        i=0
-        #adjust the length of the input read
-        length=1000
-        ar=[]
-        program2vec=np.zeros(128)
-        test=0.0
-        while(i<len(text)):
-            if(i+length<len(text)):
-                for l in range(0,length):
-                    ar.append(text[i])
-                    i+=1
-            else:
-                while(i < len(text)):
-                    ar.append(text[i])
-                    i+=1
-            #generate the embeddings based on assembly array
-            embeddings = palmtree.encode(ar)
-            for embedding in embeddings:
-                test+=embedding[0]
-                #add the vector to the numpy array
-                program2vec=np.add(program2vec,embedding)
-            print(embeddings.shape)
-            ar.clear()
-        program2vec=np.divide(program2vec,len(text))
-        print(program2vec)
-        print(program2vec.shape)
-        if(benign==True):
-            with open("out/Benigns/out/benignembeddings.csv", "a") as output: 
-                writer=csv.writer(output)
-                output.write(str(malwaretype)+",0,")
-                writer.writerow(program2vec)
+    #read one program as input and add it to the assembly text array
+    with open(inp,"r") as input:
+        for texti in input.readlines():
+            texti=texti[:-1]
+            text.append(texti)
+    i=0
+    #adjust the length of the input read
+    length=1000
+    ar=[]
+    program2vec=np.zeros(128)
+    test=0.0
+    while(i<len(text)):
+        if(i+length<len(text)):
+            for l in range(0,length):
+                ar.append(text[i])
+                i+=1
         else:
-            with open("out/Malicious/out/maliciousembeddings.csv", "a") as output:
-                writer=csv.writer(output)
-                output.write(str(malwaretype)+",1,")
-                writer.writerow(program2vec)
+            while(i < len(text)):
+                ar.append(text[i])
+                i+=1
+        #generate dictionary for all tf scores: 
+        frequencies = generatefrequencies(text)
+        #generate all tf-idf scores for ar array
+        tfidf=generatescores(ar,frequencies)
+        #generate the embeddings based on assembly array
+        embeddings = palmtree.encode(ar)
+        # uncomment for old implementation
+        # for embedding in embeddings:
+        iterator=0
+        while iterator < len(embeddings):
+            test+=embeddings[iterator][0]
+            #tf-idf implmementation
+            np.multiply(embeddings[iterator],tfidf[iterator])
+            #add the vector to the numpy array
+            program2vec=np.add(program2vec,embeddings[iterator])
+        print(embeddings.shape)
+        ar.clear()
+    program2vec=np.divide(program2vec,len(text))
+    print(program2vec)
+    print(program2vec.shape)
+    if(benign==True):
+        with open("out/Benigns/out/benignembeddings.csv", "a") as output: 
+            writer=csv.writer(output)
+            output.write(str(malwaretype)+",0,")
+            writer.writerow(program2vec)
+    else:
+        with open("out/Malicious/out/maliciousembeddings.csv", "a") as output:
+            writer=csv.writer(output)
+            output.write(str(malwaretype)+",1,")
+            writer.writerow(program2vec)
 
 for file in files:
     print(file)

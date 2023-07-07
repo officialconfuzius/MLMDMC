@@ -20,11 +20,15 @@ sc=StandardScaler()
 X_train = sc.fit_transform(X_train)
 X_test = sc.fit_transform(X_test)
 
-svc=SVC()
+#this configuration has an accuracy of .8837
+# svc=SVC(gamma=0.1,C=10.0,kernel='rbf')
+#this configuration has an accuracy of .8739
+svc=SVC(gamma=0.1,C=1.0,kernel="rbf")
+# svc=SVC()
 
 #HYPERPARAMETER TUNING, ALL ACCURACIES ARE GENERATED FROM A DATASET WITH 277 ENTRIES (162 malicious, 115 benign)
-#FOR GRIDSEARCH UNCOMMENT THE FOLLOWING LINES (accuracy=0.8036)
-# # List of C values
+# FOR GRIDSEARCH UNCOMMENT THE FOLLOWING LINES (accuracy=0.8036)
+# List of C values
 # C_range = np.logspace(-1, 1, 3)
 # print(f'The list of values for C are {C_range}')
 # # List of gamma values
@@ -36,7 +40,7 @@ svc=SVC()
 #     # Regularization parameter.
 #     "C": C_range,
 #     # Kernel type
-#     "kernel": ['rbf', 'poly'],
+#     "kernel": ['rbf', 'poly','linear'],
 #     # Gamma is the Kernel coefficient for ‘rbf’, ‘poly’ and ‘sigmoid’.
 #     "gamma": gamma_range.tolist()+['scale', 'auto']
 #     }
@@ -64,18 +68,18 @@ svc=SVC()
 # # Print the best accuracy score for the testing dataset
 # print(f'The accuracy score for the testing dataset is {grid_search.score(X_test, y_test):.4f}')
 
-# svm = SVC(kernel='linear',random_state=0,C=2.0,gamma=12)
-# # svm = SVC(kernel='rbf',random_state=0)
+# # svm = SVC(kernel='linear',random_state=0,C=2.0,gamma=12)
+# svm = SVC(kernel='rbf',random_state=0)
 # accuracies = cross_val_score(estimator = svm, X = X_train, y = y_train, cv = 40)
 # print(accuracies.mean())
 # print(accuracies.std())
-# # svm.fit(X_train,y_train)
+svc.fit(X_train,y_train)
 
-# # print(svm.score(X_train,y_train))
-# # print(svm.score(X_test,y_test))
+print(svc.score(X_train,y_train))
+print(svc.score(X_test,y_test))
 
 #UNCOMMENT THE FOLLOWING LINES FOR RANDOM SEARCH OPTIMIZATION: (accuracy=0.8036)
-# # List of C values
+# List of C values
 # C_range = np.logspace(-10, 10, 21)
 # print(f'The list of values for C are {C_range}')
 # # List of gamma values
@@ -117,7 +121,7 @@ svc=SVC()
 # print(f'The accuracy score for the testing dataset is {random_search.score(X_test, y_test):.4f}')
 
 #UNCOMMENT THE FOLLOWING LINES FOR BAYESIAN OPTIMIZATION: (accuracy=0.7857)
-# Space
+# # Space
 # gamma_range = np.logspace(-10, 10, 21)
 # C_range = np.logspace(-10, 10, 21)
 # space = {

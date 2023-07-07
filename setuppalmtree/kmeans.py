@@ -9,12 +9,12 @@ X=df.iloc[:,2:].values
 sc=StandardScaler()
 X = sc.fit_transform(X)
 #setup kmeans
-kmeans = KMeans(n_clusters=5)
+kmeans = KMeans(n_clusters=4)
 kmeans.fit(X)
 df["cluster"]=kmeans.labels_
 print(df)
 
-#maybe plot the results. tbd
+#plot the results. tbd
 #plt.scatter(x=?,y=?,c=df["cluster"])
 
 

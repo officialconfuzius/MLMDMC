@@ -11,9 +11,7 @@ from sklearn.ensemble import RandomForestClassifier
 dfm = pd.read_csv("out/Malicious/out/maliciousembeddings.csv",header=None)
 dfb = pd.read_csv("out/Benigns/out/benignembeddings.csv",header=None)
 df = pd.concat([dfb,dfm])
-#ignore first column for training data and ignore all columns but the first
-#one for the class
-#THE CLASS IS STILL MALWARETYPE, BUT IT SHOULD BE CHANGED IN THE FUTURE TO MALWARE
+
 y=df.iloc[:,1].values
 X=df.iloc[:,2:].values
 
@@ -24,11 +22,19 @@ X_train = sc.fit_transform(X_train)
 X_test = sc.fit_transform(X_test)
 
 #CLASSIFIERS
-model = RandomForestClassifier(n_estimators=100, criterion='entropy',random_state=0)
-
+#this model has an accuracy of .8697
+# model = RandomForestClassifier(n_estimators=1200,max_depth=25,min_samples_leaf=1,min_samples_split=2, criterion='entropy',random_state=0)
+#this model is even better accuracy of .8717
+# model = RandomForestClassifier(max_depth= 30, min_samples_leaf= 1, min_samples_split=2, n_estimators= 1300, criterion='entropy',random_state=0)
+# model.fit(X_train,y_train)
+# print(model.score(X_train,y_train))
+# print(model.score(X_test,y_test))
+model=RandomForestClassifier(criterion='entropy',random_state=0)
 #HYPERPARAMETER OPTIMIZATION
 #GridSearch
-n_estimators = [100, 300, 500, 800, 1200]
+#MAYBE INCREASE THE NUMBER OF ESTIMATORS IN FUTURE TUNING SESSIONS.
+# n_estimators=[100, 300, 500, 800, 1200]
+n_estimators = [1200, 1300, 1400, 1500,1600,1700]
 max_depth = [5, 8, 15, 25, 30]
 min_samples_split = [2, 5, 10, 15, 100]
 min_samples_leaf = [1, 2, 5, 10] 
@@ -42,7 +48,7 @@ gridF = GridSearchCV(model, hyperF, cv = 3, verbose = 1,
 bestF = gridF.fit(X_train, y_train)
 print(f'The best hyperparameters are {bestF.best_params_}')
 print(f'The accuracy score for the testing dataset is {bestF.score(X_test, y_test):.4f}')
-#VALIDATION CURVES:
+# VALIDATION CURVES:
 # num_est=[100, 300, 500, 750, 800, 1200]
 # train_scoreNum, test_scoreNum = validation_curve(
 #                                 RandomForestClassifier(),

@@ -8,6 +8,38 @@ files = []
 benign=False
 numberofthreads=4
 
+def insertstarspaces(line):
+    l=0
+    while(l<len(line)):
+        if(line[l]=="*"):
+            line=line[:l]+ " * " + line[l+1:]
+            l+=2
+        l = l+1
+    return line
+
+def insertspaces(string):
+    i = 0
+    while(i < len(string)):
+        if(string[i]=="["):
+            if(string[i-1]!=" "):
+                string=string[:i]+" "+string[i:]
+            else:    
+                string=string[:i+1]+" "+string[i+1:]
+        elif(string[i]=="]"):
+            if(string[i-1]!=" "):
+                if(len(string)>i+1):
+                    flag = True if string[i+1]!=" " else False
+                    string=string[:i]+" "+string[i:]
+                    if(flag==False):
+                        i+=1
+                else:
+                    string=string[:i]+" "+string[i:]
+                    i+=1
+            else:
+                string=string[:i+1]+" "+string[i+1:]
+        i+=1
+    return string
+
 def get_main_code_section(sections, base_of_code):
     addresses = []
     #get addresses of all sections
@@ -46,6 +78,10 @@ def fine_disassemble(exe,filename):
         for i in md.disasm(data, begin):
             stringobject = "%s %s" %(i.mnemonic, i.op_str)
             stringobject=stringobject.replace(',','')
+            if(stringobject.find("[")!=-1 or stringobject.find("]")!=-1):
+                stringobject=insertspaces(stringobject)
+            if(stringobject.find("*")!=-1):
+                stringobject=insertstarspaces(stringobject)
             if(benign==True):
                 with open("out/Benigns/"+filename+".text","a") as out:
                     out.write(stringobject)
