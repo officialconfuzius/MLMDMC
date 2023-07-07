@@ -13,7 +13,7 @@ import math
 palmtree = utils.UsableTransformer(model_path="./palmtree/transformer.ep19", vocab_path="./palmtree/vocab")
 files=[]
 benign=False
-
+sumofallscores=0
 df = pd.read_csv("out/idfscores.csv")
 
 def findMalwareType(filename):
@@ -97,19 +97,9 @@ def generatefrequencies(instructions):
         else: 
             dict[instruction]=1
     return dict
-def getdivisor(leninst):
-    #get all instructions that are present in every document
-    numdocs = getNumberOfDocuments()
-    sub = 0
-    it=0
-    allValues=df["document_frequency"].values
-    while it < len(allValues):
-        if(allValues[it]==numdocs):
-            sub+=1
-        it+=1
-    re = leninst - sub
-    return re
+
 def generatescores(instructions,dict):
+    global sumofallscores
     re = []
     numberofdocs=getNumberOfDocuments()
     for inst in instructions: 
@@ -117,6 +107,8 @@ def generatescores(instructions,dict):
         docfreq=df["document_frequency"].values[np.where(df["name"].values==instru)[0][0]]
         tf=(1+math.log10(dict[instru]))/(1+math.log10(max(dict.values())))
         tfidfscore=math.log10(numberofdocs/docfreq)*tf
+        if tfidfscore!=0.0:
+            sumofallscores = sumofallscores + tfidfscore
         re.append(tfidfscore)
     return re
     
@@ -158,9 +150,7 @@ def createEmbeddings(inp,filename):
             program2vec=np.add(program2vec,embeddings[iterator])
             iterator+=1
         ar.clear()
-    #get divisor
-    div=getdivisor(len(text))
-    program2vec=np.divide(program2vec,div)
+    program2vec=np.divide(program2vec,sumofallscores)
     print(program2vec)
     if(benign==True):
         with open("out/Benigns/out/benignembeddings.csv", "a") as output: 
