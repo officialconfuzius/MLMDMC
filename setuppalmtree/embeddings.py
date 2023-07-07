@@ -117,6 +117,8 @@ def createEmbeddings(inp,filename):
             texti=texti[:-1]
             text.append(texti)
     i=0
+    #generate dictionary for all tf scores: 
+    frequencies = generatefrequencies(text)
     #adjust the length of the input read
     length=1000
     ar=[]
@@ -131,8 +133,6 @@ def createEmbeddings(inp,filename):
             while(i < len(text)):
                 ar.append(text[i])
                 i+=1
-        #generate dictionary for all tf scores: 
-        frequencies = generatefrequencies(text)
         #generate all tf-idf scores for ar array
         tfidf=generatescores(ar,frequencies)
         #generate the embeddings based on assembly array
@@ -146,6 +146,7 @@ def createEmbeddings(inp,filename):
             np.multiply(embeddings[iterator],tfidf[iterator])
             #add the vector to the numpy array
             program2vec=np.add(program2vec,embeddings[iterator])
+            iterator+=1
         print(embeddings.shape)
         ar.clear()
     program2vec=np.divide(program2vec,len(text))
