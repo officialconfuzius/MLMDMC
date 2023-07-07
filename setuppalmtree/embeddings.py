@@ -76,8 +76,8 @@ def recognizeinst(assemblyline):
 
 def getNumberOfDocuments():
     number=0
-    ar1=readfiles("out/Malcious/")
-    ar2=readfiles("out/Benign/")
+    ar1=readfiles("out/Malicious/")
+    ar2=readfiles("out/Benigns/")
     number=len(ar1)+len(ar2)
     return number
 
@@ -97,13 +97,25 @@ def generatefrequencies(instructions):
         else: 
             dict[instruction]=1
     return dict
-
+def getdivisor(leninst):
+    #get all instructions that are present in every document
+    numdocs = getNumberOfDocuments()
+    sub = 0
+    it=0
+    allValues=df["document_frequency"].values
+    while it < len(allValues):
+        if(allValues[it]==numdocs):
+            sub+=1
+        it+=1
+    re = leninst - sub
+    return re
 def generatescores(instructions,dict):
     re = []
     numberofdocs=getNumberOfDocuments()
     for inst in instructions: 
-        docfreq=df["document_frequency"][df["name"].index(inst)]
-        tf=dict[inst]
+        instru=recognizeinst(inst)
+        docfreq=df["document_frequency"].values[np.where(df["name"].values==instru)[0][0]]
+        tf=(1+math.log10(dict[instru]))/(1+math.log10(max(dict.values())))
         tfidfscore=math.log10(numberofdocs/docfreq)*tf
         re.append(tfidfscore)
     return re
@@ -123,7 +135,6 @@ def createEmbeddings(inp,filename):
     length=1000
     ar=[]
     program2vec=np.zeros(128)
-    test=0.0
     while(i<len(text)):
         if(i+length<len(text)):
             for l in range(0,length):
@@ -141,17 +152,16 @@ def createEmbeddings(inp,filename):
         # for embedding in embeddings:
         iterator=0
         while iterator < len(embeddings):
-            test+=embeddings[iterator][0]
             #tf-idf implmementation
-            np.multiply(embeddings[iterator],tfidf[iterator])
+            embeddings[iterator]=np.multiply(embeddings[iterator],tfidf[iterator])
             #add the vector to the numpy array
             program2vec=np.add(program2vec,embeddings[iterator])
             iterator+=1
-        print(embeddings.shape)
         ar.clear()
-    program2vec=np.divide(program2vec,len(text))
+    #get divisor
+    div=getdivisor(len(text))
+    program2vec=np.divide(program2vec,div)
     print(program2vec)
-    print(program2vec.shape)
     if(benign==True):
         with open("out/Benigns/out/benignembeddings.csv", "a") as output: 
             writer=csv.writer(output)
