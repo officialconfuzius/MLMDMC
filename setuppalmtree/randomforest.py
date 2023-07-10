@@ -22,15 +22,27 @@ X_train = sc.fit_transform(X_train)
 X_test = sc.fit_transform(X_test)
 
 #CLASSIFIERS
+#this model has an accuracy of .5202 on the testing set tf-idf
+# model = RandomForestClassifier(max_depth=30,min_samples_leaf=1,min_samples_split=5,n_estimators=1200)
 #this model has an accuracy of .8697
 # model = RandomForestClassifier(n_estimators=1200,max_depth=25,min_samples_leaf=1,min_samples_split=2, criterion='entropy',random_state=0)
 #this model is even better accuracy of .8717
 # model = RandomForestClassifier(max_depth= 30, min_samples_leaf= 1, min_samples_split=2, n_estimators= 1300, criterion='entropy',random_state=0)
+# accuracies = cross_val_score(estimator = model, X = X_train, y = y_train, cv = 40)
+# print(accuracies.mean())
+# print(accuracies.std())
+# model.fit(X_train,y_train)
+
+# print(model.score(X_train,y_train))
+# print(model.score(X_test,y_test))
+
 # model.fit(X_train,y_train)
 # print(model.score(X_train,y_train))
 # print(model.score(X_test,y_test))
-model=RandomForestClassifier(criterion='entropy',random_state=0)
-#HYPERPARAMETER OPTIMIZATION
+# model=RandomForestClassifier(criterion='entropy',random_state=0)
+
+model = RandomForestClassifier(random_state=0,criterion='entropy')
+# #HYPERPARAMETER OPTIMIZATION
 #GridSearch
 #MAYBE INCREASE THE NUMBER OF ESTIMATORS IN FUTURE TUNING SESSIONS.
 # n_estimators=[100, 300, 500, 800, 1200]
@@ -48,35 +60,35 @@ gridF = GridSearchCV(model, hyperF, cv = 3, verbose = 1,
 bestF = gridF.fit(X_train, y_train)
 print(f'The best hyperparameters are {bestF.best_params_}')
 print(f'The accuracy score for the testing dataset is {bestF.score(X_test, y_test):.4f}')
-# VALIDATION CURVES:
-# num_est=[100, 300, 500, 750, 800, 1200]
-# train_scoreNum, test_scoreNum = validation_curve(
-#                                 RandomForestClassifier(),
-#                                 X = X_train, y = y_train, 
-#                                 param_name = 'n_estimators', 
-#                                 param_range = num_est, cv = 3)
-# forestVC = RandomForestClassifier(random_state = 1,
-#                                   n_estimators = 750,
-#                                   max_depth = 15, 
-#                                   min_samples_split = 5,  min_samples_leaf = 1) 
-# modelVC = forestVC.fit(X_train, y_train) 
-# y_predVC = modelVC.predict(X_test)
-# print(modelVC.score(X_train,y_train))
-# print(modelVC.score(X_test,y_test))
-#RANDOM SEARCH
-# rf = RandomForestClassifier()
-# rs_space={'max_depth':list(np.arange(10, 100, step=10)) + [None],
-#               'n_estimators':np.arange(10, 500, step=50),
-#               'max_features':randint(1,7),
-#               'criterion':['gini','entropy'],
-#               'min_samples_leaf':randint(1,4),
-#               'min_samples_split':np.arange(2, 10, step=2)
-#          }
-# rf_random = RandomizedSearchCV(rf, rs_space, n_iter=500, scoring='accuracy', n_jobs=-1, cv=3)
-# model_random = rf_random.fit(X_train,y_train)
-# print('Best hyperparameters are: '+str(model_random.best_params_))
-# print('Best score is: '+str(model_random.best_score_))
+# # VALIDATION CURVES:
+# # num_est=[100, 300, 500, 750, 800, 1200]
+# # train_scoreNum, test_scoreNum = validation_curve(
+# #                                 RandomForestClassifier(),
+# #                                 X = X_train, y = y_train, 
+# #                                 param_name = 'n_estimators', 
+# #                                 param_range = num_est, cv = 3)
+# # forestVC = RandomForestClassifier(random_state = 1,
+# #                                   n_estimators = 750,
+# #                                   max_depth = 15, 
+# #                                   min_samples_split = 5,  min_samples_leaf = 1) 
+# # modelVC = forestVC.fit(X_train, y_train) 
+# # y_predVC = modelVC.predict(X_test)
+# # print(modelVC.score(X_train,y_train))
+# # print(modelVC.score(X_test,y_test))
+# #RANDOM SEARCH
+# # rf = RandomForestClassifier()
+# # rs_space={'max_depth':list(np.arange(10, 100, step=10)) + [None],
+# #               'n_estimators':np.arange(10, 500, step=50),
+# #               'max_features':randint(1,7),
+# #               'criterion':['gini','entropy'],
+# #               'min_samples_leaf':randint(1,4),
+# #               'min_samples_split':np.arange(2, 10, step=2)
+# #          }
+# # rf_random = RandomizedSearchCV(rf, rs_space, n_iter=500, scoring='accuracy', n_jobs=-1, cv=3)
+# # model_random = rf_random.fit(X_train,y_train)
+# # print('Best hyperparameters are: '+str(model_random.best_params_))
+# # print('Best score is: '+str(model_random.best_score_))
 
 
-# print(model.score(X_train,y_train))
-# print(model.score(X_test,y_test))
+# # print(model.score(X_train,y_train))
+# # print(model.score(X_test,y_test))
