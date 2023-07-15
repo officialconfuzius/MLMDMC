@@ -2,6 +2,9 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import (precision_score,
+    recall_score,
+    f1_score, accuracy_score,confusion_matrix,ConfusionMatrixDisplay)
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import StratifiedKFold, GridSearchCV, RandomizedSearchCV, cross_val_score,validation_curve
 from scipy.stats import randint
@@ -27,39 +30,52 @@ X_test = sc.fit_transform(X_test)
 #this model has an accuracy of .8697
 # model = RandomForestClassifier(n_estimators=1200,max_depth=25,min_samples_leaf=1,min_samples_split=2, criterion='entropy',random_state=0)
 #this model is even better accuracy of .8717
-# model = RandomForestClassifier(max_depth= 30, min_samples_leaf= 1, min_samples_split=2, n_estimators= 1300, criterion='entropy',random_state=0)
-# accuracies = cross_val_score(estimator = model, X = X_train, y = y_train, cv = 40)
-# print(accuracies.mean())
-# print(accuracies.std())
-# model.fit(X_train,y_train)
+model = RandomForestClassifier(max_depth= 30, min_samples_leaf= 1, min_samples_split=2, n_estimators= 1300, criterion='entropy',random_state=0)
 
-# print(model.score(X_train,y_train))
-# print(model.score(X_test,y_test))
+model.fit(X_train,y_train)
+#Confusion matrix:
+confusion_matrix = confusion_matrix(y_test, model.predict(X_test))
+cm_display = ConfusionMatrixDisplay(confusion_matrix = confusion_matrix, display_labels = [False, True])
+
+cm_display.plot()
+plt.show()
+
+predictions=model.predict(X_test)
+#calculate the accuracy score: 
+accuracyScore=accuracy_score(y_test,predictions)
+print("accuracy:"+str(accuracyScore))
+
+#get f1, recall and precision scores: 
+precision=precision_score(y_test,predictions)
+recall = recall_score(y_test,predictions)
+f1score = f1_score(y_test,predictions)
+print("precision:"+str(precision))
+print("recall:"+str(recall))
+print("f1 score:"+str(f1score))
 
 # model.fit(X_train,y_train)
 # print(model.score(X_train,y_train))
 # print(model.score(X_test,y_test))
 # model=RandomForestClassifier(criterion='entropy',random_state=0)
 
-model = RandomForestClassifier(random_state=0,criterion='entropy')
+# model = RandomForestClassifier(random_state=0,criterion='entropy')
 # #HYPERPARAMETER OPTIMIZATION
 #GridSearch
-#MAYBE INCREASE THE NUMBER OF ESTIMATORS IN FUTURE TUNING SESSIONS.
 # n_estimators=[100, 300, 500, 800, 1200]
-n_estimators = [1200, 1300, 1400, 1500,1600,1700]
-max_depth = [5, 8, 15, 25, 30]
-min_samples_split = [2, 5, 10, 15, 100]
-min_samples_leaf = [1, 2, 5, 10] 
+# n_estimators = [1200, 1300, 1400, 1500,1600,1700]
+# max_depth = [5, 8, 15, 25, 30]
+# min_samples_split = [2, 5, 10, 15, 100]
+# min_samples_leaf = [1, 2, 5, 10] 
 
-hyperF = dict(n_estimators = n_estimators, max_depth = max_depth,  
-              min_samples_split = min_samples_split, 
-             min_samples_leaf = min_samples_leaf)
+# hyperF = dict(n_estimators = n_estimators, max_depth = max_depth,  
+#               min_samples_split = min_samples_split, 
+#              min_samples_leaf = min_samples_leaf)
 
-gridF = GridSearchCV(model, hyperF, cv = 3, verbose = 1, 
-                      n_jobs = -1)
-bestF = gridF.fit(X_train, y_train)
-print(f'The best hyperparameters are {bestF.best_params_}')
-print(f'The accuracy score for the testing dataset is {bestF.score(X_test, y_test):.4f}')
+# gridF = GridSearchCV(model, hyperF, cv = 3, verbose = 1, 
+#                       n_jobs = -1)
+# bestF = gridF.fit(X_train, y_train)
+# print(f'The best hyperparameters are {bestF.best_params_}')
+# print(f'The accuracy score for the testing dataset is {bestF.score(X_test, y_test):.4f}')
 
 #UNCOMMENT THE FOLLOWING LINES FOR RANDOM SEARCH OPTIMIZATION: (accuracy=0.8036)
 # List of C values

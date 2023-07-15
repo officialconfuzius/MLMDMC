@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from sklearn import metrics
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import (accuracy_score, f1_score, precision_score, recall_score)
 from sklearn.model_selection import StratifiedKFold, GridSearchCV, RandomizedSearchCV, cross_val_score
 from hyperopt import tpe, STATUS_OK, Trials, hp, fmin, space_eval
 from sklearn.svm import SVC
@@ -22,27 +23,35 @@ X_train = sc.fit_transform(X_train)
 X_test = sc.fit_transform(X_test)
 
 #this new configuration has an accuracy of .6191 on the testing set tf-idf
-svc=SVC(C=10.0,gamma=10.0,kernel='poly')
+# svc=SVC(C=10.0,gamma=10.0,kernel='poly')
 #this configuration has an accuracy of .8837
 # svc=SVC(gamma=0.1,C=10.0,kernel='rbf')
 #this configuration has an accuracy of .8739
-# svc=SVC(gamma=0.1,C=1.0,kernel="rbf")
+svc=SVC(gamma=0.1,C=1.0,kernel="rbf")
 # svc=SVC()
 
-# accuracies = cross_val_score(estimator = svc, X = X_train, y = y_train, cv = 40)
-# print(accuracies.mean())
-# print(accuracies.std())
 svc.fit(X_train,y_train)
 
-# print(svc.score(X_train,y_train))
-# print(svc.score(X_test,y_test))
-
-
+#build confusion matrix
 confusion_matrix = metrics.confusion_matrix(y_test, svc.predict(X_test))
 cm_display = metrics.ConfusionMatrixDisplay(confusion_matrix = confusion_matrix, display_labels = [False, True])
 
 cm_display.plot()
 plt.show()
+
+predictions=svc.predict(X_test)
+#calculate the accuracy: 
+accuracyScore=accuracy_score(y_test,predictions)
+print("accuracy:"+str(accuracyScore))
+
+#calculate f1, precision and recall score: 
+precisionScore = precision_score(y_test,predictions)
+recallScore=recall_score(y_test,predictions)
+f1Score=f1_score(y_test,predictions)
+print("precision:"+str(precisionScore))
+print("recall:"+str(recallScore))
+print("f1Score:"+str(f1Score))
+
 
 #HYPERPARAMETER TUNING, ALL ACCURACIES ARE GENERATED FROM A DATASET WITH 277 ENTRIES (162 malicious, 115 benign)
 # FOR GRIDSEARCH UNCOMMENT THE FOLLOWING LINES (accuracy=0.8036)
