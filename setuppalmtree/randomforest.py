@@ -60,35 +60,45 @@ gridF = GridSearchCV(model, hyperF, cv = 3, verbose = 1,
 bestF = gridF.fit(X_train, y_train)
 print(f'The best hyperparameters are {bestF.best_params_}')
 print(f'The accuracy score for the testing dataset is {bestF.score(X_test, y_test):.4f}')
-# # VALIDATION CURVES:
-# # num_est=[100, 300, 500, 750, 800, 1200]
-# # train_scoreNum, test_scoreNum = validation_curve(
-# #                                 RandomForestClassifier(),
-# #                                 X = X_train, y = y_train, 
-# #                                 param_name = 'n_estimators', 
-# #                                 param_range = num_est, cv = 3)
-# # forestVC = RandomForestClassifier(random_state = 1,
-# #                                   n_estimators = 750,
-# #                                   max_depth = 15, 
-# #                                   min_samples_split = 5,  min_samples_leaf = 1) 
-# # modelVC = forestVC.fit(X_train, y_train) 
-# # y_predVC = modelVC.predict(X_test)
-# # print(modelVC.score(X_train,y_train))
-# # print(modelVC.score(X_test,y_test))
-# #RANDOM SEARCH
-# # rf = RandomForestClassifier()
-# # rs_space={'max_depth':list(np.arange(10, 100, step=10)) + [None],
-# #               'n_estimators':np.arange(10, 500, step=50),
-# #               'max_features':randint(1,7),
-# #               'criterion':['gini','entropy'],
-# #               'min_samples_leaf':randint(1,4),
-# #               'min_samples_split':np.arange(2, 10, step=2)
-# #          }
-# # rf_random = RandomizedSearchCV(rf, rs_space, n_iter=500, scoring='accuracy', n_jobs=-1, cv=3)
-# # model_random = rf_random.fit(X_train,y_train)
-# # print('Best hyperparameters are: '+str(model_random.best_params_))
-# # print('Best score is: '+str(model_random.best_score_))
 
+#UNCOMMENT THE FOLLOWING LINES FOR RANDOM SEARCH OPTIMIZATION: (accuracy=0.8036)
+# List of C values
+# C_range = np.logspace(-10, 10, 21)
+# print(f'The list of values for C are {C_range}')
+# # List of gamma values
+# gamma_range = np.logspace(-10, 10, 21)
+# print(f'The list of values for gamma are {gamma_range}')
 
-# # print(model.score(X_train,y_train))
-# # print(model.score(X_test,y_test))
+# # Define the search space
+# param_grid = { 
+#     # Regularization parameter.
+#     "C": C_range,
+#     # Kernel type
+#     "kernel": ['rbf', 'poly'],
+#     # Gamma is the Kernel coefficient for ‘rbf’, ‘poly’ and ‘sigmoid’.
+#     "gamma": gamma_range.tolist()+['scale', 'auto']
+#     }
+# # Set up score
+# scoring = ['accuracy']
+# # Set up the k-fold cross-validation
+# kfold = StratifiedKFold(n_splits=3, shuffle=True, random_state=0)
+# # Define random search
+# random_search = RandomizedSearchCV(estimator=svc, 
+#                            param_distributions=param_grid, 
+#                            n_iter=100,
+#                            scoring=scoring, 
+#                            refit='accuracy', 
+#                            n_jobs=-1, 
+#                            cv=kfold, 
+#                            verbose=0)
+# # Fit grid search
+# random_result = random_search.fit(X_train, y_train)
+# # Print grid search summary
+# print(random_result)
+
+# # Print the best accuracy score for the training dataset
+# print(f'The best accuracy score for the training dataset is {random_result.best_score_:.4f}')
+# # Print the hyperparameters for the best score
+# print(f'The best hyperparameters are {random_result.best_params_}')
+# # Print the best accuracy score for the testing dataset
+# print(f'The accuracy score for the testing dataset is {random_search.score(X_test, y_test):.4f}')

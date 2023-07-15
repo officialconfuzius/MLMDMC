@@ -60,6 +60,11 @@ else:
             files.append(f)
         else:
             continue
+    for h in os.listdir("out/Malicious/extra/out/"):
+        if(h[-5:]==".text"):
+            files.append(h)
+        else:
+            continue
 
 def recognizeinst(assemblyline): 
     index = 0
@@ -78,7 +83,8 @@ def getNumberOfDocuments():
     number=0
     ar1=readfiles("out/Malicious/")
     ar2=readfiles("out/Benigns/")
-    number=len(ar1)+len(ar2)
+    ar3=readfiles("out/Malicious/extra/out/")
+    number=len(ar1)+len(ar2)+len(ar3)
     return number
 
 def readfiles(path):
@@ -135,7 +141,7 @@ def createEmbeddings(inp,filename):
     #generate dictionary for all tf scores: 
     frequencies = generatefrequencies(text)
     #adjust the length of the input read
-    length=10000
+    length=1000
     ar=[]
     program2vec=np.zeros(128)
     while(i<len(text)):
@@ -182,4 +188,7 @@ for file in files:
     if(benign==True):
         createEmbeddings("out/Benigns/"+str(file),str(file))
     else:
-        createEmbeddings("out/Malicious/"+str(file),str(file))
+        if(file[:11]!="VirusShare_"):
+            createEmbeddings("out/Malicious/"+str(file),str(file))
+        else:
+            createEmbeddings("out/Malicious/extra/out/"+str(file),str(file))

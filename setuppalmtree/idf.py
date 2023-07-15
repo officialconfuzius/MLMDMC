@@ -45,25 +45,44 @@ def mainmethod(filelist):
                             idf["document_frequency"][idf["name"].index(instrname)] = idf["document_frequency"][idf["name"].index(instrname)]+1
                             alreadyadded[instrname]=1
         except: 
-            with open("out/Benigns/"+str(file),"r") as inp: 
-                for line in inp.readlines(): 
-                    instrname=recognizeinst(line)
-                    if(instrname not in idf["name"]):
-                        idf["name"].append(instrname)
-                        idf["document_frequency"].append(1)
-                        alreadyadded[instrname]=1
-                    else: 
-                        if(instrname in alreadyadded.keys()):
-                            continue
-                        else:
-                            idf["document_frequency"][idf["name"].index(instrname)]=idf["document_frequency"][idf["name"].index(instrname)]+1
+            try:
+                with open("out/Benigns/"+str(file),"r") as inp: 
+                    for line in inp.readlines(): 
+                        instrname=recognizeinst(line)
+                        if(instrname not in idf["name"]):
+                            idf["name"].append(instrname)
+                            idf["document_frequency"].append(1)
                             alreadyadded[instrname]=1
+                        else: 
+                            if(instrname in alreadyadded.keys()):
+                                continue
+                            else:
+                                idf["document_frequency"][idf["name"].index(instrname)]=idf["document_frequency"][idf["name"].index(instrname)]+1
+                                alreadyadded[instrname]=1
+            except: 
+                with open("out/Malicious/extra/out/"+str(file),"r") as inp: 
+                    for line in inp.readlines(): 
+                        instrname=recognizeinst(line)
+                        if(instrname not in idf["name"]):
+                            idf["name"].append(instrname)
+                            idf["document_frequency"].append(1)
+                            alreadyadded[instrname]=1
+                        else: 
+                            if(instrname in alreadyadded.keys()):
+                                continue
+                            else:
+                                idf["document_frequency"][idf["name"].index(instrname)]=idf["document_frequency"][idf["name"].index(instrname)]+1
+                                alreadyadded[instrname]=1
 
 #create array of all files
 allfiles = readfiles("out/Malicious/")
 allbenigns = readfiles("out/Benigns/")
+allextra  = readfiles("out/Malicious/extra/out/")
 for a in allbenigns: 
     allfiles.append(a)
+
+for extra in allextra: 
+    allfiles.append(extra)
 
 mainmethod(allfiles)
 print("Done!")

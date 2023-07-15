@@ -9,7 +9,7 @@ X=df.iloc[:,2:].values
 sc=StandardScaler()
 X = sc.fit_transform(X)
 #setup kmeans
-kmeans = KMeans(n_clusters=4)
+kmeans = KMeans(n_clusters=6)
 kmeans.fit(X)
 df["cluster"]=kmeans.labels_
 print(df)
