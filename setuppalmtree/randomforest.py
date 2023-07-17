@@ -8,6 +8,7 @@ from sklearn.metrics import (precision_score,
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import StratifiedKFold, GridSearchCV, RandomizedSearchCV, cross_val_score,validation_curve
 from scipy.stats import randint
+from math import sqrt
 from sklearn.ensemble import RandomForestClassifier
 #THIS IMPLEMENTATION STILL LACKS ON HYPERPARAMETER TUNING
 #THIS HAS TO BE CHANGED LATER ON:
@@ -25,82 +26,90 @@ X_train = sc.fit_transform(X_train)
 X_test = sc.fit_transform(X_test)
 
 #CLASSIFIERS
+#this model has an accuracy of .9379 on testing set of extended arithemetic mean: 
+# model = RandomForestClassifier(max_depth=15,min_samples_leaf=1,min_samples_split=2,n_estimators=300)
 #this model has an accuracy of .5202 on the testing set tf-idf
 # model = RandomForestClassifier(max_depth=30,min_samples_leaf=1,min_samples_split=5,n_estimators=1200)
 #this model has an accuracy of .8697
 # model = RandomForestClassifier(n_estimators=1200,max_depth=25,min_samples_leaf=1,min_samples_split=2, criterion='entropy',random_state=0)
-#this model is even better accuracy of .8717
+#this model is even better accuracy of .8717 embeddings mean choice
 # model = RandomForestClassifier(max_depth= 30, min_samples_leaf= 1, min_samples_split=2, n_estimators= 1300, criterion='entropy',random_state=0)
-# configuration for tf-idf extended accuracy of .8236
-# model = RandomForestClassifier(max_depth=30,min_samples_leaf=1,min_samples_split=2,n_estimators=1200)
-# model.fit(X_train,y_train)
+# configuration for tf-idf extended accuracy of .8243
+model = RandomForestClassifier(max_depth=30,min_samples_leaf=1,min_samples_split=5,n_estimators=300)
+model.fit(X_train,y_train)
 #Confusion matrix:
-# confusion_matrix = confusion_matrix(y_test, model.predict(X_test))
-# cm_display = ConfusionMatrixDisplay(confusion_matrix = confusion_matrix, display_labels = [False, True])
+confusion_matrix = confusion_matrix(y_test, model.predict(X_test))
+cm_display = ConfusionMatrixDisplay(confusion_matrix = confusion_matrix, display_labels = [False, True])
 
-# cm_display.plot()
-# plt.show()
+cm_display.plot()
+plt.savefig("out/rftf-idfext")
 
-# predictions=model.predict(X_test)
+predictions=model.predict(X_test)
 #calculate the accuracy score: 
-# accuracyScore=accuracy_score(y_test,predictions)
-# print("accuracy:"+str(accuracyScore))
+accuracyScore=accuracy_score(y_test,predictions)
+tn, fp, fn, tp = confusion_matrix.ravel()
+specificity = tn / (tn+fp)
+sensitivity = tp / (tp+fn)
+gscore = sqrt(sensitivity*specificity)
+print("accuracy:"+str(accuracyScore))
+print("specificity:"+str(specificity))
+print("sensitivity:"+str(sensitivity))
+print("GScore:"+str(gscore))
 
 #get f1, recall and precision scores: 
-# precision=precision_score(y_test,predictions)
-# recall = recall_score(y_test,predictions)
-# f1score = f1_score(y_test,predictions)
-# print("precision:"+str(precision))
-# print("recall:"+str(recall))
-# print("f1 score:"+str(f1score))
+precision=precision_score(y_test,predictions)
+recall = recall_score(y_test,predictions)
+f1score = f1_score(y_test,predictions)
+print("precision:"+str(precision))
+print("recall:"+str(recall))
+print("f1 score:"+str(f1score))
 
 # model.fit(X_train,y_train)
 # print(model.score(X_train,y_train))
 # print(model.score(X_test,y_test))
 
 
-model = RandomForestClassifier(random_state=0,criterion='entropy')
-# #HYPERPARAMETER OPTIMIZATION
-#GridSearch
+# model = RandomForestClassifier(random_state=0,criterion='entropy')
+# # # #HYPERPARAMETER OPTIMIZATION
+# # #GridSearch
 # n_estimators=[100, 300, 500, 800, 1200]
-n_estimators = [1200, 1300, 1400, 1500,1600,1700]
-max_depth = [5, 8, 15, 25, 30]
-min_samples_split = [2, 5, 10, 15, 100]
-min_samples_leaf = [1, 2, 5, 10] 
+# # n_estimators = [1200, 1300, 1400, 1500,1600,1700]
+# max_depth = [5, 8, 15, 25, 30]
+# min_samples_split = [2, 5, 10, 15, 100]
+# min_samples_leaf = [1, 2, 5, 10] 
 
-hyperF = dict(n_estimators = n_estimators, max_depth = max_depth,  
-              min_samples_split = min_samples_split, 
-             min_samples_leaf = min_samples_leaf)
+# hyperF = dict(n_estimators = n_estimators, max_depth = max_depth,  
+#               min_samples_split = min_samples_split, 
+#              min_samples_leaf = min_samples_leaf)
+# kfold = StratifiedKFold(n_splits=3, shuffle=True, random_state=0)
+# gridF = GridSearchCV(model, hyperF, cv = kfold, verbose = 1, 
+#                       n_jobs = -1)
+# bestF = gridF.fit(X_train, y_train)
+# print(f'The best hyperparameters are {bestF.best_params_}')
+# print(f'The accuracy score for the testing dataset is {bestF.score(X_test, y_test):.4f}')
 
-gridF = GridSearchCV(model, hyperF, cv = 3, verbose = 1, 
-                      n_jobs = -1)
-bestF = gridF.fit(X_train, y_train)
-print(f'The best hyperparameters are {bestF.best_params_}')
-print(f'The accuracy score for the testing dataset is {bestF.score(X_test, y_test):.4f}')
+#UNCOMMENT THE FOLLOWING LINES FOR RANDOM SEARCH OPTIMIZATION:
+#define search space
+# n_estimators=[100, 300, 500, 800, 1200,1300,1400,1500,1600,1700,1800,1900]
+# max_depth= [5, 8, 15, 25, 30,40,50,60,70]
+# min_samples_leaf = [1, 2, 5, 10,20,40,80] 
+# min_samples_split = [2, 5, 10, 15, 50, 100, 200]
 
-#UNCOMMENT THE FOLLOWING LINES FOR RANDOM SEARCH OPTIMIZATION: (accuracy=0.8036)
-# List of C values
-# C_range = np.logspace(-10, 10, 21)
-# print(f'The list of values for C are {C_range}')
-# # List of gamma values
-# gamma_range = np.logspace(-10, 10, 21)
-# print(f'The list of values for gamma are {gamma_range}')
-
-# # Define the search space
+# # # Define the search space
 # param_grid = { 
-#     # Regularization parameter.
-#     "C": C_range,
+#     "n_estimators": n_estimators,
 #     # Kernel type
-#     "kernel": ['rbf', 'poly'],
+#     "max_depth": max_depth,
 #     # Gamma is the Kernel coefficient for ‘rbf’, ‘poly’ and ‘sigmoid’.
-#     "gamma": gamma_range.tolist()+['scale', 'auto']
+#     "min_samples_leaf": min_samples_leaf,
+#     "min_samples_split": min_samples_split
 #     }
-# # Set up score
+# Set up score
 # scoring = ['accuracy']
 # # Set up the k-fold cross-validation
 # kfold = StratifiedKFold(n_splits=3, shuffle=True, random_state=0)
 # # Define random search
-# random_search = RandomizedSearchCV(estimator=svc, 
+# random_search = RandomizedSearchCV(estimator=model, 
 #                            param_distributions=param_grid, 
 #                            n_iter=100,
 #                            scoring=scoring, 
