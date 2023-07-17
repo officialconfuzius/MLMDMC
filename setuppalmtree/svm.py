@@ -27,76 +27,77 @@ X_test = sc.fit_transform(X_test)
 #this configuration has an accuracy of .8837
 # svc=SVC(gamma=0.1,C=10.0,kernel='rbf')
 #this configuration has an accuracy of .8739
-svc=SVC(gamma=0.1,C=1.0,kernel="rbf")
-# svc=SVC()
+# svc=SVC(gamma=0.1,C=1.0,kernel="rbf")
+# configuration for tf-idf extended accuracy of ###
+svc = SVC()
 
-svc.fit(X_train,y_train)
+# svc.fit(X_train,y_train)
 
 #build confusion matrix
-confusion_matrix = metrics.confusion_matrix(y_test, svc.predict(X_test))
-cm_display = metrics.ConfusionMatrixDisplay(confusion_matrix = confusion_matrix, display_labels = [False, True])
+# confusion_matrix = metrics.confusion_matrix(y_test, svc.predict(X_test))
+# cm_display = metrics.ConfusionMatrixDisplay(confusion_matrix = confusion_matrix, display_labels = [False, True])
 
-cm_display.plot()
-plt.show()
+# cm_display.plot()
+# plt.show()
 
-predictions=svc.predict(X_test)
+# predictions=svc.predict(X_test)
 #calculate the accuracy: 
-accuracyScore=accuracy_score(y_test,predictions)
-print("accuracy:"+str(accuracyScore))
+# accuracyScore=accuracy_score(y_test,predictions)
+# print("accuracy:"+str(accuracyScore))
 
 #calculate f1, precision and recall score: 
-precisionScore = precision_score(y_test,predictions)
-recallScore=recall_score(y_test,predictions)
-f1Score=f1_score(y_test,predictions)
-print("precision:"+str(precisionScore))
-print("recall:"+str(recallScore))
-print("f1Score:"+str(f1Score))
+# precisionScore = precision_score(y_test,predictions)
+# recallScore=recall_score(y_test,predictions)
+# f1Score=f1_score(y_test,predictions)
+# print("precision:"+str(precisionScore))
+# print("recall:"+str(recallScore))
+# print("f1Score:"+str(f1Score))
 
 
 #HYPERPARAMETER TUNING, ALL ACCURACIES ARE GENERATED FROM A DATASET WITH 277 ENTRIES (162 malicious, 115 benign)
 # FOR GRIDSEARCH UNCOMMENT THE FOLLOWING LINES (accuracy=0.8036)
 # List of C values
-# C_range = np.logspace(-1, 1, 3)
+C_range = np.logspace(-1, 1, 3)
 # C_range = [10,15,20,25]
-# print(f'The list of values for C are {C_range}')
-# # List of gamma values
-# # gamma_range = np.logspace(-1, 1, 3)
+print(f'The list of values for C are {C_range}')
+# List of gamma values
+gamma_range = np.logspace(-1, 1, 3)
 # gamma_range = [10,15,20,25]
-# print(f'The list of values for gamma are {gamma_range}')
+print(f'The list of values for gamma are {gamma_range}')
 
-# # Define the search space
-# param_grid = { 
-#     # Regularization parameter.
-#     "C": C_range,
-#     # Kernel type
-#     "kernel": ['rbf', 'poly','linear'],
-#     # Gamma is the Kernel coefficient for ‘rbf’, ‘poly’ and ‘sigmoid’.
-#     # "gamma": gamma_range.tolist()+['scale', 'auto']
-#     "gamma":gamma_range+["scale","auto"]
-#     }
-# # Set up score
-# scoring = ['accuracy']
-# # Set up the k-fold cross-validation
-# kfold = StratifiedKFold(n_splits=3, shuffle=True, random_state=0)
+# Define the search space
+param_grid = { 
+    # Regularization parameter.
+    "C": C_range,
+    # Kernel type
+    "kernel": ['rbf', 'poly','linear'],
+    # Gamma is the Kernel coefficient for ‘rbf’, ‘poly’ and ‘sigmoid’.
+    "gamma": gamma_range.tolist()+['scale', 'auto']
+    # "gamma":gamma_range+["scale","auto"]
+    }
+# Set up score
+scoring = ['accuracy']
+# Set up the k-fold cross-validation
+kfold = StratifiedKFold(n_splits=3, shuffle=True, random_state=0)
 
-# # Define grid search
-# grid_search = GridSearchCV(estimator=svc, 
-#                            param_grid=param_grid, 
-#                            scoring=scoring, 
-#                            refit='accuracy', 
-#                            n_jobs=-1, 
-#                            cv=kfold, 
-#                            verbose=0)
-# # Fit grid search
-# grid_result = grid_search.fit(X_train, y_train)
-# # Print grid search summary
-# print(grid_result)
-# # Print the best accuracy score for the training dataset
-# print(f'The best accuracy score for the training dataset is {grid_result.best_score_:.4f}')
-# # Print the hyperparameters for the best score
-# print(f'The best hyperparameters are {grid_result.best_params_}')
-# # Print the best accuracy score for the testing dataset
-# print(f'The accuracy score for the testing dataset is {grid_search.score(X_test, y_test):.4f}')
+# Define grid search
+grid_search = GridSearchCV(estimator=svc, 
+                           param_grid=param_grid, 
+                           scoring=scoring, 
+                           refit='accuracy', 
+                           n_jobs=-1, 
+                           cv=kfold, 
+                           verbose=0)
+# Fit grid search
+grid_result = grid_search.fit(X_train, y_train)
+# Print grid search summary
+print(grid_result)
+# Print the best accuracy score for the training dataset
+print(f'The best accuracy score for the training dataset is {grid_result.best_score_:.4f}')
+# Print the hyperparameters for the best score
+print(f'The best hyperparameters are {grid_result.best_params_}')
+# Print the best accuracy score for the testing dataset
+print(f'The accuracy score for the testing dataset is {grid_search.score(X_test, y_test):.4f}')
 
 # # svm = SVC(kernel='linear',random_state=0,C=2.0,gamma=12)
 # svm = SVC(kernel='rbf',random_state=0)
