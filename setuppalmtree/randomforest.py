@@ -10,14 +10,19 @@ from sklearn.model_selection import StratifiedKFold, GridSearchCV, RandomizedSea
 from scipy.stats import randint
 from math import sqrt
 from sklearn.ensemble import RandomForestClassifier
-#THIS IMPLEMENTATION STILL LACKS ON HYPERPARAMETER TUNING
-#THIS HAS TO BE CHANGED LATER ON:
-dfm = pd.read_csv("out/Malicious/out/maliciousembeddings.csv",header=None)
-dfb = pd.read_csv("out/Benigns/out/benignembeddings.csv",header=None)
-df = pd.concat([dfb,dfm])
 
-y=df.iloc[:,1].values
-X=df.iloc[:,2:].values
+#for oversampled data: 
+df = pd.read_csv("out/oversamplingstfidf.csv")
+
+# dfm = pd.read_csv("out/Malicious/out/maliciousembeddings.csv",header=None)
+# dfb = pd.read_csv("out/Benigns/out/benignembeddings.csv",header=None)
+# df = pd.concat([dfb,dfm])
+
+#for oversampled data: 
+y = df.iloc[:,0].values
+X= df.iloc[:,1:].values
+# y=df.iloc[:,1].values
+# X=df.iloc[:,2:].values
 
 X_train,X_test,y_train,y_test=train_test_split(X,y,test_size=0.2,random_state=0)
 
@@ -26,16 +31,16 @@ X_train = sc.fit_transform(X_train)
 X_test = sc.fit_transform(X_test)
 
 #CLASSIFIERS
-#this model has an accuracy of .9379 on testing set of extended arithemetic mean: 
-# model = RandomForestClassifier(max_depth=15,min_samples_leaf=1,min_samples_split=2,n_estimators=300)
+#this model has an accuracy of .9111 on testing set of extended arithemetic mean: 
+# model = RandomForestClassifier(max_depth=30,min_samples_leaf=1,min_samples_split=2,n_estimators=800)
 #this model has an accuracy of .5202 on the testing set tf-idf
 # model = RandomForestClassifier(max_depth=30,min_samples_leaf=1,min_samples_split=5,n_estimators=1200)
 #this model has an accuracy of .8697
 # model = RandomForestClassifier(n_estimators=1200,max_depth=25,min_samples_leaf=1,min_samples_split=2, criterion='entropy',random_state=0)
 #this model is even better accuracy of .8717 embeddings mean choice
 # model = RandomForestClassifier(max_depth= 30, min_samples_leaf= 1, min_samples_split=2, n_estimators= 1300, criterion='entropy',random_state=0)
-# configuration for tf-idf extended accuracy of .8243
-model = RandomForestClassifier(max_depth=30,min_samples_leaf=1,min_samples_split=5,n_estimators=300)
+# configuration for tf-idf extended accuracy of .6735
+model = RandomForestClassifier(max_depth=30,min_samples_leaf=1,min_samples_split=2,n_estimators=500)
 model.fit(X_train,y_train)
 #Confusion matrix:
 confusion_matrix = confusion_matrix(y_test, model.predict(X_test))
@@ -45,7 +50,7 @@ cm_display.plot()
 plt.savefig("out/rftf-idfext")
 
 predictions=model.predict(X_test)
-#calculate the accuracy score: 
+# calculate the accuracy score: 
 accuracyScore=accuracy_score(y_test,predictions)
 tn, fp, fn, tp = confusion_matrix.ravel()
 specificity = tn / (tn+fp)
@@ -73,7 +78,7 @@ print("f1 score:"+str(f1score))
 # # # #HYPERPARAMETER OPTIMIZATION
 # # #GridSearch
 # n_estimators=[100, 300, 500, 800, 1200]
-# # n_estimators = [1200, 1300, 1400, 1500,1600,1700]
+# n_estimators = [1200, 1300, 1400, 1500,1600,1700]
 # max_depth = [5, 8, 15, 25, 30]
 # min_samples_split = [2, 5, 10, 15, 100]
 # min_samples_leaf = [1, 2, 5, 10] 

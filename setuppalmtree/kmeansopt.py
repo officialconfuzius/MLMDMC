@@ -3,7 +3,7 @@ import pandas as pd
 from sklearn.preprocessing import StandardScaler
 import matplotlib.pyplot as plt
 
-df = pd.read_csv("out/Malicious/out/maliciousembeddings.csv",header=None)
+df = pd.read_csv("out/Malicious/out/maliciousembeddingstfidf.csv",header=None)
 means = []
 inertias = []
 X=df.iloc[:,2:].values

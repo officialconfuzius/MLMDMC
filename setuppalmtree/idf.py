@@ -1,8 +1,5 @@
 import pandas as pd
 import os
-from threading import *
-
-numberofthreads=4
 
 idf = {"name":[],"document_frequency":[]}
 

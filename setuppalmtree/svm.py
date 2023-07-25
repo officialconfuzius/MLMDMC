@@ -1,4 +1,5 @@
 import pandas as pd
+from collections import Counter
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn import metrics
@@ -9,13 +10,21 @@ from sklearn.model_selection import StratifiedKFold, GridSearchCV, RandomizedSea
 from hyperopt import tpe, STATUS_OK, Trials, hp, fmin, space_eval
 from sklearn.svm import SVC
 from math import sqrt
+from imblearn.over_sampling import ADASYN
 
-dfm = pd.read_csv("out/Malicious/out/maliciousembeddings.csv",header=None)
-dfb = pd.read_csv("out/Benigns/out/benignembeddings.csv",header=None)
-df = pd.concat([dfb,dfm])
 
-y=df.iloc[:,1].values
-X=df.iloc[:,2:].values
+#for oversampled data: 
+df = pd.read_csv("out/oversamplingsam.csv")
+
+# dfm = pd.read_csv("out/Malicious/out/maliciousembeddings.csv",header=None)
+# dfb = pd.read_csv("out/Benigns/out/benignembeddings.csv",header=None)
+# df = pd.concat([dfb,dfm])
+
+#for oversampled data: 
+y = df.iloc[:,0].values
+X= df.iloc[:,1:].values
+# y=df.iloc[:,1].values
+# X=df.iloc[:,2:].values
 
 X_train,X_test,y_train,y_test=train_test_split(X,y,test_size=0.2,random_state=0)
 
@@ -29,10 +38,10 @@ X_test = sc.fit_transform(X_test)
 # svc=SVC(gamma=0.1,C=10.0,kernel='rbf')
 #this configuration has an accuracy of .8739 embeddings mean choice
 # svc=SVC(gamma=0.1,C=1.0,kernel="rbf")
-#extended tf-idf configuration accuracy: .3312
-svc=SVC(C=10.0,gamma=10.0,kernel="poly")
-# configuration for extended arithmetic mean: .9365
-# svc=SVC(C=10.0,gamma=0.1,kernel="rbf")
+#extended tf-idf configuration accuracy: .5888
+# svc=SVC(C=10.0,gamma=10.0,kernel="rbf")
+# configuration for extended arithmetic mean: .9261
+svc=SVC(C=10.0,gamma=0.1,kernel="rbf")
 # svc = SVC()
 
 svc.fit(X_train,y_train)
@@ -43,7 +52,7 @@ cm_display = metrics.ConfusionMatrixDisplay(confusion_matrix = confusion_matrix,
 
 cm_display.plot()
 # plt.show()
-plt.savefig("out/svmtf-idfweightext.png")
+plt.savefig("out/svmamextended.png")
 predictions=svc.predict(X_test)
 #calculate the accuracy: 
 accuracyScore=accuracy_score(y_test,predictions)
@@ -53,7 +62,7 @@ sensitivity = tp / (tp+fn)
 gscore = sqrt(sensitivity*specificity)
 print("accuracy:"+str(accuracyScore))
 print("specificity:"+str(specificity))
-# print("sensitivity:"+str(sensitivity))
+print("sensitivity:"+str(sensitivity))
 print("GScore:"+str(gscore))
 
 #calculate f1, precision and recall score: 
@@ -67,7 +76,7 @@ print("f1Score:"+str(f1Score))
 
 #HYPERPARAMETER TUNING, ALL ACCURACIES ARE GENERATED FROM A DATASET WITH 277 ENTRIES (162 malicious, 115 benign)
 # FOR GRIDSEARCH UNCOMMENT THE FOLLOWING LINES (accuracy=0.8036)
-# List of C values
+# # List of C values
 # C_range = np.logspace(-1, 1, 3)
 # # C_range = [10,15,20,25]
 # print(f'The list of values for C are {C_range}')

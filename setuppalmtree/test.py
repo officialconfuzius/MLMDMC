@@ -1,19 +1,6 @@
-ar = ["test","me","now","me","now","me","now","me","now"]
-scores = [1, 0, 1, 0, 1, 0, 1, 0, 1]
+import pandas as pd
 
-def minimizearray(array,tfidfar):
-    i = 0
-    while (i < len(array)): 
-        if(tfidfar[i]==0.0): 
-            array.pop(i)
-            tfidfar.pop(i)
-            continue
-        else:
-            i+=1
-    return array
+df = pd.read_csv("out/idfscores.csv")
 
-print(scores)
-print(ar)
-ar=minimizearray(ar,scores)
-print(scores)
-print(ar)
+
+print(df.nsmallest(100,"document_frequency"))

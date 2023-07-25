@@ -14,7 +14,7 @@ palmtree = utils.UsableTransformer(model_path="./palmtree/transformer.ep19", voc
 files=[]
 benign=True
 sumofallscores=0
-df = pd.read_csv("out/idfscores.csv")
+df = pd.read_csv("out/idfscoresdown2.csv")
 
 def findMalwareType(filename):
     if(benign):
@@ -80,11 +80,7 @@ def recognizeinst(assemblyline):
     return None
 
 def getNumberOfDocuments():
-    number=0
-    ar1=readfiles("out/Malicious/")
-    ar2=readfiles("out/Benigns/")
-    ar3=readfiles("out/Malicious/extra/out/")
-    number=len(ar1)+len(ar2)+len(ar3)+2
+    number=1416
     return number
 
 def readfiles(path):
@@ -173,19 +169,21 @@ def createEmbeddings(inp,filename):
     program2vec=np.divide(program2vec,sumofallscores)
     print(program2vec)
     if(benign==True):
-        np.save("out/Benigns/out/"+filename+"ext.npy",program2vec)
+        np.save("out/Benigns/out/"+filename+"addexpe.npy",program2vec)
     else:
         with open("out/Malicious/out/maliciousembeddings.csv", "a") as output:
             writer=csv.writer(output)
             output.write(str(malwaretype)+",1,")
             writer.writerow(program2vec)
 
-for file in files:
-    print(file)
-    if(benign==True):
-        createEmbeddings("out/"+str(file),str(file))
-    else:
-        if(file[:11]!="VirusShare_"):
-            createEmbeddings("out/Malicious/"+str(file),str(file))
-        else:
-            createEmbeddings("out/Malicious/extra/out/"+str(file),str(file))
+createEmbeddings("out/putty.exe.text","putty.exe.text")
+createEmbeddings("out/infectputty.exe.text","infectputty.exe.text")
+# for file in files:
+#     print(file)
+#     if(benign==True):
+#         createEmbeddings("../Goldstandard/out/"+str(file),str(file))
+#     else:
+#         if(file[:11]!="VirusShare_"):
+#             createEmbeddings("out/Malicious/"+str(file),str(file))
+#         else:
+#             createEmbeddings("out/Malicious/extra/out/"+str(file),str(file))
