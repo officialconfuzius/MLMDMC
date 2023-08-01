@@ -42,6 +42,7 @@ X_test = sc.fit_transform(X_test)
 # configuration for tf-idf extended accuracy of .6735
 model = RandomForestClassifier(max_depth=30,min_samples_leaf=1,min_samples_split=2,n_estimators=500)
 model.fit(X_train,y_train)
+
 #Confusion matrix:
 confusion_matrix = confusion_matrix(y_test, model.predict(X_test))
 cm_display = ConfusionMatrixDisplay(confusion_matrix = confusion_matrix, display_labels = [False, True])

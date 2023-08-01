@@ -1,9 +1,9 @@
 import pandas as pd
 import os
-
+#initialize a dictionary, which captures all instructions and their frequencies
 idf = {"name":[],"document_frequency":[]}
 
-#this one has to be copied to embeddings.py
+#recognize the instruction mnemonic
 def recognizeinst(assemblyline): 
     index = 0
     while(index < len(assemblyline)):
@@ -16,14 +16,14 @@ def recognizeinst(assemblyline):
             return instr
         index+=1
     return None
-
+#create array of assembly code from file path
 def readfiles(path):
     files=[]
     for file in os.listdir(path): 
         if(file[-5:]==".text"):
             files.append(file)
     return files
-
+#fill the dictionary
 def mainmethod(filelist): 
     for file in filelist: 
         alreadyadded = {}

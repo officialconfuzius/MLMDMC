@@ -7,7 +7,7 @@ from math import ceil
 files = []
 benign=False
 numberofthreads=4
-
+#format the assemblycode as described in palmtree paper
 def insertstarspaces(line):
     l=0
     while(l<len(line)):
@@ -16,7 +16,7 @@ def insertstarspaces(line):
             l+=2
         l = l+1
     return line
-
+#format the assemblycode as described in palmtree paper
 def insertspaces(string):
     i = 0
     while(i < len(string)):
@@ -39,7 +39,7 @@ def insertspaces(string):
                 string=string[:i+1]+" "+string[i+1:]
         i+=1
     return string
-
+#retrieve the main code section
 def get_main_code_section(sections, base_of_code):
     addresses = []
     #get addresses of all sections
@@ -60,6 +60,7 @@ def get_main_code_section(sections, base_of_code):
         else:
             #this means we failed to locate it
             return None
+#disassemble the file
 def fine_disassemble(exe,filename):
     #get main code section
     main_code = get_main_code_section(exe.sections, exe.OPTIONAL_HEADER.BaseOfCode)
@@ -92,7 +93,7 @@ def fine_disassemble(exe,filename):
                     out.write("\n")
             last_address = int(i.address)
             last_size = i.size
-        #sometimes you need to skip some bytes
+        #sometimes bytes need to be skipped
         begin = max(int(last_address),begin)+last_size+1
         if begin >= end:
             print("out")
@@ -110,7 +111,7 @@ def threadingtask(list):
         #parse exe file
             exe = pefile.PE(exe_file_path)
             try:
-        #call the function I created earlier
+        #call the disassembly function
                 fine_disassemble(exe,f)
             except:
                 print('something is wrong with this exe file')
@@ -144,7 +145,7 @@ if __name__ =="__main__":
             chunked_list.append(files[i:len(files)])
     print(chunked_list)
     print(len(chunked_list))
-
+    #start multiprocessing
     processes = []
     for s in range(numberofthreads):
         process = multiprocessing.Process(target=threadingtask, args=(chunked_list[s],))

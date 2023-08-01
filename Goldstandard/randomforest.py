@@ -24,11 +24,12 @@ X= df.iloc[:,1:].values
 # y=df.iloc[:,1].values
 # X=df.iloc[:,2:].values
 
+#load gold standard
 putty = np.load("out/putty.exe.textAM.npy")
 maliciousputty = np.load("out/infectputty.exe.textAM.npy")
 
 array = [putty, maliciousputty]
-
+#standardize data
 sc=StandardScaler()
 X_train = sc.fit_transform(X)
 array = sc.fit_transform(array)
@@ -44,10 +45,10 @@ model = RandomForestClassifier(max_depth=30,min_samples_leaf=1,min_samples_split
 # configuration for tf-idf extended accuracy of .6735
 # model = RandomForestClassifier(max_depth=30,min_samples_leaf=1,min_samples_split=2,n_estimators=500)
 model.fit(X,y)
-
+#predict the gold standard
 array = model.predict(array)
 puttyprediction = array[0]
 maliciousputtyprediction = array[1]
-
+#print the results
 print("Putty (expected 0): "+str(puttyprediction))
 print("MaliciousPutty (expected 1): "+str(maliciousputtyprediction))

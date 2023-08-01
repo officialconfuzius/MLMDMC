@@ -23,10 +23,12 @@ X= df.iloc[:,1:].values
 # y=df.iloc[:,1].values
 # X=df.iloc[:,2:].values
 
+#load the gold standard
 putty = np.load("out/putty.exe.textEXTENDED.npy")
 maliciousputty = np.load("out/infectputty.exe.textEXTENDED.npy")
 array = [putty, maliciousputty]
 
+#standardize the data
 sc=StandardScaler()
 X_train = sc.fit_transform(X)
 array = sc.fit_transform(array)
@@ -44,11 +46,11 @@ svc=SVC(C=10.0,gamma=10.0,kernel="rbf")
 # svc = SVC()
 
 svc.fit(X,y)
-
+#predict the gold standard
 array = svc.predict(array)
 
 puttyprediction = array[0]
 maliciousputtyprediction = array[1]
-
+#print the results
 print("Putty (expected 0): "+str(puttyprediction))
 print("MaliciousPutty (expected 1): "+str(maliciousputtyprediction))

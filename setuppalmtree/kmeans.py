@@ -4,25 +4,36 @@ import numpy as np
 from sklearn.preprocessing import StandardScaler
 import matplotlib.pyplot as plt
 
+#import the malware features
 df = pd.read_csv("out/Malicious/out/maliciousembeddings.csv",header=None)
+#select the embeddings
 X=df.iloc[:,2:].values
+#standardize the data
 sc=StandardScaler()
 X = sc.fit_transform(X)
-#setup kmeans 4: tf-idf normal dataset embeddings; 5: rest
+#setup kmeans
 kmeans = KMeans(n_clusters=4)
 kmeans.fit(X)
+#append the labels of kmeans to the dataframe
 df["cluster"]=kmeans.labels_
+#load in the gold standard
 infectedputty = np.load("../Goldstandard/out/infectputty.exe.textAM.npy")
 goldarray = [infectedputty]
+#make a prediction for the gold standard
 goldpred = kmeans.predict(goldarray)
+#print the output:
 print("infected putty prediction: "+str(goldpred[0]))
+#select the type of malware
 firstcol = df.iloc[:,0:1]
-lastcol = df["cluster"].to_numpy()
 firstcol = firstcol.to_numpy()
+#select the predicted label
+lastcol = df["cluster"].to_numpy()
+#initialize a dictonary, which contains all the clusters.
 dict = {}
 for t in lastcol: 
     if t not in dict.keys(): 
         dict[t] = {}
+#fill the dictonary, with dictionaries that contain all malware types inside the cluster.
 for iterator in range(0,len(firstcol)):
     if firstcol[iterator] == 1: 
         #find key
@@ -165,58 +176,3 @@ for mv in maxValues:
     sumofallmaxes += mv
 purityofall = sumofallmaxes / sumofall
 print("purity of the whole clustering: "+str(purityofall))
-#Count malware types
-# firstcolstrings = []
-# for malwaretype in firstcol: 
-#     if malwaretype[0] == 1: 
-#         firstcolstrings.append("Virus")
-#     elif malwaretype[0] == 2: 
-#         firstcolstrings.append("Backdoor")
-#     elif malwaretype[0] == 3: 
-#         firstcolstrings.append("Worm")
-#     elif malwaretype[0] == 4: 
-#         firstcolstrings.append("Trojan")
-#     elif malwaretype[0] == 5: 
-#         firstcolstrings.append("Exploit")
-#     elif malwaretype[0] == 6: 
-#         firstcolstrings.append("Hoax")
-#     elif malwaretype[0] == 7: 
-#         firstcolstrings.append("Dos")
-#     elif malwaretype[0] == 8: 
-#         firstcolstrings.append("Flooder")
-#     elif malwaretype[0] == 9: 
-#         firstcolstrings.append("Rootkit")
-#     elif malwaretype[0] == 10: 
-#         firstcolstrings.append("Backdoor")
-#     elif malwaretype[0] == 11: 
-#         firstcolstrings.append("Spamtool")
-#     elif malwaretype[0] == 12: 
-#         firstcolstrings.append("Spoofer")
-#     elif malwaretype[0] == 13: 
-#         firstcolstrings.append("Packed")
-#     elif malwaretype[0] == 14: 
-#         firstcolstrings.append("No_Match")
-# data = [firstcol, lastcol]
-# dfout = pd.DataFrame(data,columns=["Malware Type","Clustering"])
-
-# print(df)
-
-
-
-
-
-
-
-
-# dict = {"Virus": 0, "Backdoor": 0, "Worm": 0,
-#         "Trojan": 0, "Exploit": 0, "Hoax": 0,
-#         "Dos":0,"Flooder":0,"Rootkit":0
-#         ,"Backdoor":0,"Spamtool":0,"Spoofer":0
-#         ,"Packed":0,"No_Match":0}
-# # print(firstcolstrings)
-# for key in dict.keys(): 
-#     for i in range(0,len(firstcolstrings)):
-#         if firstcolstrings[i] == key: 
-#             dict[key]=dict[key]+1
-# finalframe = pd.DataFrame(dict,index=[0])
-# print(finalframe)

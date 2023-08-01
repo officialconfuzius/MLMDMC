@@ -74,8 +74,8 @@ print("recall:"+str(recallScore))
 print("f1Score:"+str(f1Score))
 
 
-#HYPERPARAMETER TUNING, ALL ACCURACIES ARE GENERATED FROM A DATASET WITH 277 ENTRIES (162 malicious, 115 benign)
-# FOR GRIDSEARCH UNCOMMENT THE FOLLOWING LINES (accuracy=0.8036)
+#HYPERPARAMETER TUNING
+# FOR GRIDSEARCH UNCOMMENT THE FOLLOWING LINES
 # # List of C values
 # C_range = np.logspace(-1, 1, 3)
 # # C_range = [10,15,20,25]

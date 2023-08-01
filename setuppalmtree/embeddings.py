@@ -9,13 +9,19 @@ import csv
 import pandas as pd
 import math
 
-
+#this program generates the tf-idf and arithmetic mean embeddings
+#import palmtree module
 palmtree = utils.UsableTransformer(model_path="./palmtree/transformer.ep19", vocab_path="./palmtree/vocab")
-files=[]
-benign=False
-sumofallscores=0
-df = pd.read_csv("out/idfscores.csv")
 
+#initialize list of assembly files as input
+files=[]
+#state if the program is supposed to generate embeddings for benign files or not
+benign=False
+#initialize the sum of all weights for the tf-idf embeddings
+sumofallscores=0
+#read the document frequency scores for the tf-idf embeddings
+df = pd.read_csv("out/idfscores.csv")
+#find the malware type using the filename
 def findMalwareType(filename):
     if(benign):
         return 0
@@ -48,6 +54,7 @@ def findMalwareType(filename):
     else:
         #return 14 if malware cannot be matched
         return 14
+#set original file directory
 if(benign==True):
     for f in os.listdir("out/Benigns/"):
         if(f[-5:]==".text"):
@@ -65,7 +72,7 @@ else:
             files.append(h)
         else:
             continue
-
+#method for recognizing the mnemonic of an instruction
 def recognizeinst(assemblyline): 
     index = 0
     while(index < len(assemblyline)):
@@ -78,7 +85,7 @@ def recognizeinst(assemblyline):
             return instr
         index+=1
     return None
-
+#generate the number of documents inside the collection:
 def getNumberOfDocuments():
     number=0
     ar1=readfiles("out/Malicious/")
@@ -86,14 +93,14 @@ def getNumberOfDocuments():
     ar3=readfiles("out/Malicious/extra/out/")
     number=len(ar1)+len(ar2)+len(ar3)
     return number
-
+#generate file array for all the assembly files in a directory
 def readfiles(path):
     files=[]
     for file in os.listdir(path): 
         if(file[-5:]==".text"):
             files.append(file)
     return files
-
+#generate the frequency of a specific instruction
 def generatefrequencies(instructions): 
     dict = {}
     for inst in instructions: 
@@ -103,7 +110,7 @@ def generatefrequencies(instructions):
         else: 
             dict[instruction]=1
     return dict
-
+#generate the tf-idf score for an instruction inside a document
 def generatescores(instructions,dict):
     global sumofallscores
     re = []
@@ -117,7 +124,7 @@ def generatescores(instructions,dict):
             sumofallscores = sumofallscores + tfidfscore
         re.append(tfidfscore)
     return re
-
+#minimize the array to save some computation time
 def minimizearray(array,tfidfar):
     i = 0
     while (i < len(array)): 
@@ -128,7 +135,7 @@ def minimizearray(array,tfidfar):
         else:
             i+=1
     return array
-
+#create all embeddings using the defined methods from above:
 def createEmbeddings(inp,filename):
     text=[]
     malwaretype=findMalwareType(filename)
@@ -182,7 +189,7 @@ def createEmbeddings(inp,filename):
             writer=csv.writer(output)
             output.write(str(malwaretype)+",1,")
             writer.writerow(program2vec)
-
+#iterate through all files and generate their embeddings
 for file in files:
     print(file)
     if(benign==True):
