@@ -1,0 +1,2 @@
+The 'Goldstandard' directory entails the gold standard '.exe' files and the gold standard prediction implementations of the classifiers. Furthermore, the out directory entails all embeddings of the gold standard as well as the disassembled gold standard versions.
+The 'setuppalmtree' directory entails the classifiers, which entail their hyperparameter tuning and their predictions on the corpus without the gold standard. Additionally, the clustering with its gold standard prediction is shown here.
